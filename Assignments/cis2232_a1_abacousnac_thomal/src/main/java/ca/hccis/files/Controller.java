@@ -1,223 +1,183 @@
 package ca.hccis.files;
 
-import ca.hccis.files.entity.Camper;
+import ca.hccis.files.entity.FoodOrder;
 import ca.hccis.util.CisUtility;
 import com.google.gson.Gson;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Controls the overall flow of the program.
  *
- * @author cis2232
- * @since 20260917
+ * @author Thomal Abacousnac
+ * @since 20260923
  */
 public class Controller {
-
-    public static final int EXIT = 0;
-
-    public static final String MENU = "1) Add" + System.lineSeparator()
-            + "2) Edit" + System.lineSeparator()
-            + "3) View" + System.lineSeparator()
-            + EXIT + ") Exit"
-            + System.lineSeparator();
+    public static final String EXIT = "X";
+    public static final String MENU = "A) Add" + System.lineSeparator()
+            + "V) View" + System.lineSeparator()
+            + "X) eXit" + System.lineSeparator();
 
     public static final String MESSAGE_ERROR = "Error";
     public static final String MESSAGE_EXIT = "Goodbye";
     public static final String MESSAGE_SUCCESS = "Success";
-
-    private static HashMap<Integer, Camper> camperMap = new HashMap();
+    private static List<FoodOrder> orderList = new ArrayList<>();
     private static Gson gson = new Gson();
 
-    //TODO if the cis2232 folder does not exist, then have your program create it.
-    //TODO filename to be changed from campers based on assignment requirements.
-    public static final String PATH_NAME = "E:\\cis2232\\campers.json";
+    /**
+     * File where the order information is stored.
+     */
+    public static final String PATH_NAME = "c:\\cis2232\\data_abacousnac_thomal.json";
 
     public static void main(String[] args) {
 
         initialize();
 
-        //Gson
-//        Camper test = camperMap.get(22334);
-//        String camperJson = gson.toJson(test);
-//        IO.println(camperJson);
-//
-//        Camper camperFromJson = gson.fromJson(camperJson, Camper.class);
-//        System.out.println(camperFromJson.toString());
-
-
-        int menuOption;
+        String menuOption;
 
         do {
-            menuOption = CisUtility.getInputInt(MENU);
-
-            switch (menuOption) {
-                case EXIT:
-                    System.out.println(MESSAGE_EXIT);
-                    break; //Break out of the loop as we're finished.
-                case 1:
+            menuOption = CisUtility.getInputString(MENU);
+            switch (menuOption.toUpperCase()) {
+                case "A":
                     add();
                     break;
-                case 2:
-                    edit();
-                    break;
-                case 3:
+                case "V":
                     viewAll();
+                    break;
+                case EXIT:
+                    System.out.println(MESSAGE_EXIT);
                     break;
                 default:
                     System.out.println(MESSAGE_ERROR);
                     break;
             }
-        } while (menuOption != EXIT);
+        } while (!menuOption.equalsIgnoreCase(EXIT));
     }
 
     /**
-     * Processing for menu option 1
-     *
-     * @author
-     * @since
+     * Processing for menu option A.
+     * <p>
+     * Adds a new food order and saves it to the file.
      */
     public static void add() {
-        Camper newCamper = new Camper();
-        IO.println("--Add Camper--");
-        newCamper.getInformation();
-
-        //TODO what if the registration id already exists.  Give the user a warning and ask if they want to overwrite the row.
-        //read file nad see if the new camper is already there, and if so check with user to see if should overwrite
-
-        int registrationId = newCamper.getRegistrationId();
-
-        // Check if the registration ID already exists.
-        if (camperMap.containsKey(registrationId)) {
-            System.out.println("A camper with registration ID " + registrationId + " already exists");
-            String answer = CisUtility.getInputString("Do you want to overwrite this camper? (Y/N): ");
-            if (answer.equalsIgnoreCase("Y")) {
-                camperMap.put(registrationId, newCamper);
-                writeAll();
-                System.out.println(MESSAGE_SUCCESS + ": Camper was overwritten.");
-            } else {
-                System.out.println("Camper was not added.");
-            }
-        } else {
-            camperMap.put(registrationId, newCamper);
-            writeAll();
-            System.out.println(MESSAGE_SUCCESS + ": Camper was added.");
-        }
+        FoodOrder newOrder = new FoodOrder();
+        System.out.println("--Add Food Order--");
+        newOrder.getInformation();
+        orderList.add(newOrder);
+        writeAll();
+        System.out.println(MESSAGE_SUCCESS + ": Food order was added.");
     }
 
     /**
-     * Processing for menu option 2.
-     *
-     * @author
-     * @since
-     */
-    public static void edit() {
-        System.out.println("--Edit Camper--");
-        int regID = CisUtility.getInputInt("Reg ID: ");
-        Camper editingCamper = camperMap.get(regID);
-        if (editingCamper == null) {
-            System.out.println(MESSAGE_ERROR + ": No camper was found with registration ID " + regID + ".");
-            return;
-        }
-        editingCamper.edit();
-        //TODO What if the regID not found?
-        //Handle this situation.
-        writeAll(); //save to file
-        System.out.println(MESSAGE_SUCCESS + ": Camper was updated.");
-    }
-
-    /**
-     * Processing for menu option 3.
-     *
-     * @author
-     * @since
+     * Processing for menu option V.
+     * <p>
+     * Displays all food orders stored in the file.
      */
     public static void viewAll() {
-        System.out.println("--View All Campers--");
+        System.out.println("--View All Food Orders--");
+
+        // Read the latest information from the file.
         readAll();
-        if (camperMap.isEmpty()) {
-            System.out.println("No campers found.");
+        if (orderList.isEmpty()) {
+            System.out.println("No food orders found.");
         } else {
-            for (Camper current : camperMap.values()) {
+            for (FoodOrder current : orderList) {
                 System.out.println(current);
             }
         }
-        //TODO Need to show all the campers.  Note want to show the latest from the file, not just
-        //what is currently in the map.
     }
 
-
+    /**
+     * Writes all food orders to the JSON file.
+     */
     public static void writeAll() {
         try {
-            FileWriter writer = new FileWriter(PATH_NAME, false);
-            for (Camper current : camperMap.values()) {
-                writer.append(gson.toJson(current));
-                writer.append(System.lineSeparator());
-                System.out.println("Successfully written JSON string to file.");
+            Path path = Paths.get(PATH_NAME);
+
+            // Create the directory if it does not exist.
+            Path parentDirectory = path.getParent();
+            if (parentDirectory != null
+                    && !Files.exists(parentDirectory)) {
+                Files.createDirectories(parentDirectory);
             }
-            writer.close();
+            try (FileWriter writer = new FileWriter(PATH_NAME, false)) {
+                for (FoodOrder current : orderList) {
+                    writer.append(gson.toJson(current));
+                    writer.append(System.lineSeparator());
+                }
+            }
+            System.out.println(MESSAGE_SUCCESS + ": Orders successfully saved.");
         } catch (IOException e) {
+            System.out.println(MESSAGE_ERROR + ": Unable to write orders to file.");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Reads all food orders from the JSON file.
+     */
     public static void readAll() {
+        Path path = Paths.get(PATH_NAME);
+        if (!Files.exists(path)) {
+            return;
+        }
+
         try {
-            FileReader reader = new FileReader(PATH_NAME);
-            List<String> lines = reader.readAllLines();
-            for (int i = 0; i < lines.size(); i++) {
-                Camper camperFromJson = gson.fromJson(lines.get(i), Camper.class);
-                camperMap.put(camperFromJson.getRegistrationId(), camperFromJson);
+            // Clear the current list so that the file
+            // represents the latest data.
+            orderList.clear();
+            List<String> lines = Files.readAllLines(path);
+            for (String line : lines) {
+                if (!line.trim().isEmpty()) {
+                    FoodOrder orderFromJson =
+                            gson.fromJson(line, FoodOrder.class);
+                    if (orderFromJson != null) {
+                        orderList.add(orderFromJson);
+                    }
+                }
             }
         } catch (IOException e) {
+            System.out.println(MESSAGE_ERROR + ": Unable to read orders from file.");
             e.printStackTrace();
         }
     }
 
-
+    /**
+     * Initializes the application.
+     * <p>
+     * Creates the cis2232 directory if necessary.
+     * If the JSON file exists, existing orders are loaded.
+     * Otherwise, an empty JSON file is created.
+     */
     public static void initialize() {
-
         Path path = Paths.get(PATH_NAME);
-
-        // Create the cis2232 folder if it does not exist.
-        Path parentDirectory = path.getParent();
-
-        if (!Files.exists(parentDirectory)) {
-            try {
+        try {
+            // Create the cis2232 directory if it does not exist.
+            Path parentDirectory = path.getParent();
+            if (parentDirectory != null
+                    && !Files.exists(parentDirectory)) {
                 Files.createDirectories(parentDirectory);
                 System.out.println("cis2232 folder created.");
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+            // Check if the JSON file exists.
+            if (Files.exists(path)) {
+                System.out.println("Existing orders found.");
+                readAll();
+            } else {
+                // Create the empty file.
+                Files.createFile(path);
+                System.out.println("Order file created.");
+            }
+
+        } catch (IOException e) {
+            System.out.println(MESSAGE_ERROR + ": Unable to initialize the application.");
+            e.printStackTrace();
         }
-
-        // Check if the file exists
-        if (Files.exists(path)) {
-            System.out.println("Campers exist.");
-            readAll();
-        } else {
-
-
-            Camper camper = new Camper(1, 22334, "Bob", "Stephens", "2020-01-05");
-            Camper camper2 = new Camper(2, 22335, "Alice", "Johnson", "2019-07-14");
-            Camper camper3 = new Camper(3, 22336, "Charlie", "Williams", "2021-03-22");
-            Camper camper4 = new Camper(4, 22337, "Diana", "Brown", "2020-11-09");
-            Camper camper5 = new Camper(5, 22338, "Ethan", "Miller", "2018-05-17");
-            camperMap.put(camper.getRegistrationId(), camper);
-            camperMap.put(camper2.getRegistrationId(), camper2);
-            camperMap.put(camper3.getRegistrationId(), camper3);
-            camperMap.put(camper4.getRegistrationId(), camper4);
-            camperMap.put(camper5.getRegistrationId(), camper5);
-
-            writeAll();
-        }
-
     }
 }
