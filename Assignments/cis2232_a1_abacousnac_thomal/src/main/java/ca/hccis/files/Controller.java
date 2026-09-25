@@ -99,7 +99,6 @@ public class Controller {
     public static void writeAll() {
         try {
             Path path = Paths.get(PATH_NAME);
-
             // Create the directory if it does not exist.
             Path parentDirectory = path.getParent();
             if (parentDirectory != null
