@@ -61,7 +61,7 @@ public class Controller {
     }
 
     /**
-     * Processing for menu option A.
+     * Processing for menu add.
      * <p>
      * Adds a new food order and saves it to the file.
      */
@@ -75,7 +75,7 @@ public class Controller {
     }
 
     /**
-     * Processing for menu option V.
+     * Processing for menu viewAll.
      * <p>
      * Displays all food orders stored in the file.
      */
