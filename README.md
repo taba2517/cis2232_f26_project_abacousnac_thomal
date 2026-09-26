@@ -1,6 +1,6 @@
 # Food Ordering and Catering System
 
-Sample CIS2232 project
+Food Ordering and Catering System project
 
 ## Development Team
 
