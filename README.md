@@ -31,16 +31,22 @@ Secondary Color: To be determined by the Business Analyst
 ## Required Fields
 
 customerName String The name of the customer placing the order
-phoneNumber String The customer's contact number in case the business needs
-to confirm the order
+
+phoneNumber String The customer's contact number in case the business needs to confirm the order
+
 mealName String The Nigerian meal selected by the customer
+
 quantity int The number of portions the customer wants to order
+
 pricePerMeal Decimal The price of one portion of the selected meal
+
 orderType String Shows whether the customer wants pickup or delivery
+
 deliveryFee Decimal The extra amount charged when delivery is selected
+
 orderDate Date The date the customer wants the food prepared or delivered
-totalCost Decimal The final amount the customer will pay after the order is
-calculated
+
+totalCost Decimal The final amount the customer will pay after the order is calculated
 
 
 ## Calculation
