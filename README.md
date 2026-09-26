@@ -5,7 +5,9 @@ Food Ordering and Catering System project
 ## Development Team
 
 Business Client: Sybil
+
 Lead Developer: Thomal
+
 Quality Control: Hagai
 
 
