@@ -26,8 +26,8 @@ subtotal to calculate the final total cost.
 
 ## Color
 
-Main Color: To be determined by the Business Analyst
-Secondary Color: To be determined by the Business Analyst
+Main Color: Deep Orange(#E85D04)
+Secondary Color: Cream(#FFF3E0)
 
 
 ## Required Fields
