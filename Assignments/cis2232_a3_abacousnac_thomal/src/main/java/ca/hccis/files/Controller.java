@@ -36,6 +36,7 @@ public class Controller {
     private static List<FoodOrder> orderList = new ArrayList<>();
     private static Gson gson = new Gson();
     private static FoodOrderBO foodOrderBO = new FoodOrderBO();
+    private static final Object dataLock = new Object();
 
     /**
      * Shared accumulator for the total number of food orders.
@@ -76,7 +77,7 @@ public class Controller {
                     viewAll();
                     break;
                 case EXIT:
-                    System.out.println(MESSAGE_EXIT);
+                    System.out.println("Thank you for using the Food Ordering System!\n" + MESSAGE_EXIT);
                     break;
                 default:
                     System.out.println(MESSAGE_ERROR);
@@ -105,6 +106,13 @@ public class Controller {
                     "A) Add"
             );
             if (option == null || option.startsWith("X")) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Thank you for using the Food Ordering System!\n"
+                                + "                          Goodbye!",
+                        "Goodbye",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
                 running = false;
                 continue;
             }
@@ -134,8 +142,7 @@ public class Controller {
         // Calculate the total cost using Assignment #2.
         double totalCost = foodOrderBO.calculate(newOrder);
         newOrder.setTotalCost(totalCost);
-        orderList.add(newOrder);
-        writeAll();
+        saveOrder(newOrder);
         int currentTotal = incrementTotalOrders();
         System.out.println("Combined total orders: " + currentTotal);
         System.out.printf("Total Cost: $%.2f%n", newOrder.getTotalCost());
@@ -149,40 +156,48 @@ public class Controller {
      */
     public static void viewAll() {
         System.out.println("--View All Food Orders--");
-
-        // Read the latest information from the file.
-        readAll();
-        if (orderList.isEmpty()) {
+        List<FoodOrder> orders;
+        // Safely read and copy the shared order list.
+        synchronized (dataLock) {
+            readAll();
+            orders = new ArrayList<>(orderList);
+        }
+        if (orders.isEmpty()) {
             System.out.println("No food orders found.");
         } else {
-            for (FoodOrder current : orderList) {
+            for (FoodOrder current : orders) {
                 System.out.println(current);
             }
         }
+        System.out.println(
+                "Combined total orders: " + getTotalOrders()
+        );
     }
 
     /**
      * Writes all food orders to the JSON file.
      */
     public static void writeAll() {
-        try {
-            Path path = Paths.get(PATH_NAME);
-            // Create the directory if it does not exist.
-            Path parentDirectory = path.getParent();
-            if (parentDirectory != null
-                    && !Files.exists(parentDirectory)) {
-                Files.createDirectories(parentDirectory);
-            }
-            try (FileWriter writer = new FileWriter(PATH_NAME, false)) {
-                for (FoodOrder current : orderList) {
-                    writer.append(gson.toJson(current));
-                    writer.append(System.lineSeparator());
+        synchronized (dataLock) {
+            try {
+                Path path = Paths.get(PATH_NAME);
+                // Create the directory if it does not exist.
+                Path parentDirectory = path.getParent();
+                if (parentDirectory != null
+                        && !Files.exists(parentDirectory)) {
+                    Files.createDirectories(parentDirectory);
                 }
+                try (FileWriter writer = new FileWriter(PATH_NAME, false)) {
+                    for (FoodOrder current : orderList) {
+                        writer.append(gson.toJson(current));
+                        writer.append(System.lineSeparator());
+                    }
+                }
+                System.out.println(MESSAGE_SUCCESS + ": Orders successfully saved.");
+            } catch (IOException e) {
+                System.out.println(MESSAGE_ERROR + ": Unable to write orders to file.");
+                e.printStackTrace();
             }
-            System.out.println(MESSAGE_SUCCESS + ": Orders successfully saved.");
-        } catch (IOException e) {
-            System.out.println(MESSAGE_ERROR + ": Unable to write orders to file.");
-            e.printStackTrace();
         }
     }
 
@@ -190,28 +205,29 @@ public class Controller {
      * Reads all food orders from the JSON file.
      */
     public static void readAll() {
-        Path path = Paths.get(PATH_NAME);
-        if (!Files.exists(path)) {
-            return;
-        }
-
-        try {
-            // Clear the current list so that the file
-            // represents the latest data.
-            orderList.clear();
-            List<String> lines = Files.readAllLines(path);
-            for (String line : lines) {
-                if (!line.trim().isEmpty()) {
-                    FoodOrder orderFromJson =
-                            gson.fromJson(line, FoodOrder.class);
-                    if (orderFromJson != null) {
-                        orderList.add(orderFromJson);
+        synchronized (dataLock) {
+            Path path = Paths.get(PATH_NAME);
+            if (!Files.exists(path)) {
+                return;
+            }
+            try {
+                // Clear the current list so that the file
+                // represents the latest data.
+                orderList.clear();
+                List<String> lines = Files.readAllLines(path);
+                for (String line : lines) {
+                    if (!line.trim().isEmpty()) {
+                        FoodOrder orderFromJson =
+                                gson.fromJson(line, FoodOrder.class);
+                        if (orderFromJson != null) {
+                            orderList.add(orderFromJson);
+                        }
                     }
                 }
+            } catch (IOException e) {
+                System.out.println(MESSAGE_ERROR + ": Unable to read orders from file.");
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            System.out.println(MESSAGE_ERROR + ": Unable to read orders from file.");
-            e.printStackTrace();
         }
     }
 
@@ -222,12 +238,10 @@ public class Controller {
         FoodOrder newOrder = new FoodOrder();
         try {
             newOrder.getInformationJOptionPane();
-            // Reuse the Assignment #2 calculation.
             double totalCost = foodOrderBO.calculate(newOrder);
             newOrder.setTotalCost(totalCost);
-            orderList.add(newOrder);
-            writeAll();
-            int currentTotal = incrementTotalOrders();
+            saveOrder(newOrder);
+            int currentTotal = getTotalOrders();
             JOptionPane.showMessageDialog(
                     null,
                     "Food order added successfully."
@@ -250,41 +264,55 @@ public class Controller {
     }
 
     /**
+     * Saves an order safely when either interface creates it.
+     */
+    public static void saveOrder(FoodOrder newOrder) {
+        synchronized (dataLock) {
+            orderList.add(newOrder);
+            writeAll();
+            totalOrders = orderList.size();
+        }
+    }
+
+    /**
      * Displays all food orders in a scrollable dialog.
      */
     public static void viewJOptionPane() {
-        if (orderList.isEmpty()) {
+        List<FoodOrder> orders;
+        synchronized (dataLock) {
+            if (orderList.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "No food orders found."
+                );
+                return;
+            }
+            StringBuilder output = new StringBuilder();
+            for (FoodOrder order : orderList) {
+                output.append(order.toString())
+                        .append(System.lineSeparator())
+                        .append("----------------------------------------")
+                        .append(System.lineSeparator())
+                        .append(System.lineSeparator());
+            }
+            output.append("Combined total orders: ")
+                    .append(getTotalOrders());
+            // Create a text area to display all orders.
+            JTextArea textArea = new JTextArea(output.toString());
+            textArea.setEditable(false);
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            textArea.setCaretPosition(0);
+            // Add scrolling support.
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new Dimension(550, 400));
             JOptionPane.showMessageDialog(
                     null,
-                    "No food orders found."
+                    scrollPane,
+                    "All Food Orders",
+                    JOptionPane.INFORMATION_MESSAGE
             );
-            return;
         }
-        StringBuilder output = new StringBuilder();
-        for (FoodOrder order : orderList) {
-            output.append(order.toString())
-                    .append(System.lineSeparator())
-                    .append("----------------------------------------")
-                    .append(System.lineSeparator())
-                    .append(System.lineSeparator());
-        }
-        output.append("Combined total orders: ")
-                .append(getTotalOrders());
-        // Create a text area to display all orders.
-        JTextArea textArea = new JTextArea(output.toString());
-        textArea.setEditable(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setCaretPosition(0);
-        // Add scrolling support.
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(550, 400));
-        JOptionPane.showMessageDialog(
-                null,
-                scrollPane,
-                "All Food Orders",
-                JOptionPane.INFORMATION_MESSAGE
-        );
     }
 
     /**

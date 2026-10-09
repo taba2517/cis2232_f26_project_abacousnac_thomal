@@ -43,8 +43,12 @@ public class FoodOrder {
         quantity = CisUtility.getInputInt("Quantity: ");
         pricePerMeal = CisUtility.getInputDouble("Price Per Meal: ");
         orderType = CisUtility.getInputString("Order Type (Pickup/Delivery): ");
-        deliveryFee = CisUtility.getInputDouble("Delivery Fee: ");
-        orderDate = CisUtility.getInputString("Order Date: ");
+        orderType = CisUtility.getInputString("Order Type (Pickup/Delivery): ");
+        if (orderType.equalsIgnoreCase("Pickup")) {
+            deliveryFee = 0;
+        } else {
+            deliveryFee = CisUtility.getInputDouble("Delivery Fee: ");
+        }
         // Calculation is not required for this assignment.
         totalCost = 0;
     }
@@ -76,10 +80,18 @@ public class FoodOrder {
                 orderTypes,
                 orderTypes[0]
         );
-        if (orderType == null) {throw new java.util.concurrent.CancellationException();}
-        String deliveryInput = JOptionPane.showInputDialog("Enter delivery fee:");
-        if (deliveryInput == null) {throw new java.util.concurrent.CancellationException();}
-        deliveryFee = Double.parseDouble(deliveryInput);
+        if (orderType == null) {
+            throw new java.util.concurrent.CancellationException();
+        }
+        if (orderType.equalsIgnoreCase("Pickup")) {
+            deliveryFee = 0;
+        } else {
+            String deliveryInput = JOptionPane.showInputDialog(null, "Enter delivery fee:");
+            if (deliveryInput == null) {
+                throw new java.util.concurrent.CancellationException();
+            }
+            deliveryFee = Double.parseDouble(deliveryInput);
+        }
         orderDate = JOptionPane.showInputDialog("Enter order date:");
         if (orderDate == null) {throw new java.util.concurrent.CancellationException();}
     }
@@ -158,29 +170,24 @@ public class FoodOrder {
 
     @Override
     public String toString() {
-        return System.lineSeparator()
-                + "Food Order"
-                + System.lineSeparator()
-                + "----------------------------------------"
-                + System.lineSeparator()
-                + "Customer Name: " + customerName
-                + System.lineSeparator()
-                + "Phone Number: " + phoneNumber
-                + System.lineSeparator()
-                + "Meal Name: " + mealName
-                + System.lineSeparator()
-                + "Quantity: " + quantity
-                + System.lineSeparator()
-                + String.format("Price Per Meal: $%.2f", pricePerMeal)
-                + System.lineSeparator()
-                + "Order Type: " + orderType
-                + System.lineSeparator()
-                + String.format("Delivery Fee: $%.2f", deliveryFee)
-                + System.lineSeparator()
-                + "Order Date: " + orderDate
-                + System.lineSeparator()
-                + String.format("Total Cost: $%.2f", totalCost)
-                + System.lineSeparator()
-                + "----------------------------------------";
+        StringBuilder output = new StringBuilder();
+        output.append("Food Order\n");
+        output.append("----------------------------------------\n");
+        output.append("Customer Name: ").append(customerName).append("\n");
+        output.append("Phone Number: ").append(phoneNumber).append("\n");
+        output.append("Meal Name: ").append(mealName).append("\n");
+        output.append("Quantity: ").append(quantity).append("\n");
+        output.append(String.format("Price Per Meal: $%.2f%n", pricePerMeal));
+        output.append("Order Type: ").append(orderType).append("\n");
+        // Only display the delivery fee for delivery orders.
+        if ("Delivery".equalsIgnoreCase(orderType)) {
+            output.append(String.format(
+                    "Delivery Fee: $%.2f%n",
+                    deliveryFee));
+        }
+        output.append("Order Date: ").append(orderDate).append("\n");
+        output.append(String.format("Total Cost: $%.2f%n", totalCost));
+        output.append("----------------------------------------");
+        return output.toString();
     }
 }
