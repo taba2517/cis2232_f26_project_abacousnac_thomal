@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import java.awt.Dimension;
 
 /**
  * Controls the overall flow of the program.
@@ -33,6 +36,11 @@ public class Controller {
     private static List<FoodOrder> orderList = new ArrayList<>();
     private static Gson gson = new Gson();
     private static FoodOrderBO foodOrderBO = new FoodOrderBO();
+
+    /**
+     * Shared accumulator for the total number of food orders.
+     */
+    private static int totalOrders = 0;
 
     /**
      * File where the order information is stored.
@@ -128,6 +136,8 @@ public class Controller {
         newOrder.setTotalCost(totalCost);
         orderList.add(newOrder);
         writeAll();
+        int currentTotal = incrementTotalOrders();
+        System.out.println("Combined total orders: " + currentTotal);
         System.out.printf("Total Cost: $%.2f%n", newOrder.getTotalCost());
         System.out.println(MESSAGE_SUCCESS + ": Food order was added.");
     }
@@ -217,6 +227,7 @@ public class Controller {
             newOrder.setTotalCost(totalCost);
             orderList.add(newOrder);
             writeAll();
+            int currentTotal = incrementTotalOrders();
             JOptionPane.showMessageDialog(
                     null,
                     "Food order added successfully."
@@ -239,22 +250,38 @@ public class Controller {
     }
 
     /**
-     * Displays all food orders through JOptionPane.
+     * Displays all food orders in a scrollable dialog.
      */
     public static void viewJOptionPane() {
         if (orderList.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No food orders found.");
+            JOptionPane.showMessageDialog(
+                    null,
+                    "No food orders found."
+            );
             return;
         }
         StringBuilder output = new StringBuilder();
         for (FoodOrder order : orderList) {
             output.append(order.toString())
                     .append(System.lineSeparator())
+                    .append("----------------------------------------")
+                    .append(System.lineSeparator())
                     .append(System.lineSeparator());
         }
+        output.append("Combined total orders: ")
+                .append(getTotalOrders());
+        // Create a text area to display all orders.
+        JTextArea textArea = new JTextArea(output.toString());
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setCaretPosition(0);
+        // Add scrolling support.
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(550, 400));
         JOptionPane.showMessageDialog(
                 null,
-                output.toString(),
+                scrollPane,
                 "All Food Orders",
                 JOptionPane.INFORMATION_MESSAGE
         );
@@ -287,9 +314,31 @@ public class Controller {
                 System.out.println("Order file created.");
             }
 
+            // Initialize the shared accumulator.
+            totalOrders = orderList.size();
+
+            System.out.println(
+                    "Current total orders: " + totalOrders
+            );
+
         } catch (IOException e) {
             System.out.println(MESSAGE_ERROR + ": Unable to initialize the application.");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Increments the shared order accumulator.
+     */
+    public static synchronized int incrementTotalOrders() {
+        totalOrders++;
+        return totalOrders;
+    }
+
+    /**
+     * Returns the current shared order count.
+     */
+    public static synchronized int getTotalOrders() {
+        return totalOrders;
     }
 }

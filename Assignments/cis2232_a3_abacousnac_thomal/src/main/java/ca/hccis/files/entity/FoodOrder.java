@@ -161,7 +161,7 @@ public class FoodOrder {
         return System.lineSeparator()
                 + "Food Order"
                 + System.lineSeparator()
-                + "------------------------------"
+                + "----------------------------------------"
                 + System.lineSeparator()
                 + "Customer Name: " + customerName
                 + System.lineSeparator()
@@ -181,6 +181,6 @@ public class FoodOrder {
                 + System.lineSeparator()
                 + String.format("Total Cost: $%.2f", totalCost)
                 + System.lineSeparator()
-                + "------------------------------";
+                + "----------------------------------------";
     }
 }
