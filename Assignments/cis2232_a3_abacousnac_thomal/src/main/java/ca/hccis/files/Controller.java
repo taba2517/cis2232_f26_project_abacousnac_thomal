@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  * Controls the overall flow of the program.
@@ -41,12 +43,13 @@ public class Controller {
 
         initialize();
 
-        Thread consoleThread = new Thread(
-                () -> runConsoleMenu(),
-                "Console-Thread"
-        );
+        // Thread 1: Console interface.
+        Thread consoleThread = new Thread(() -> runConsoleMenu(), "Console-Thread");
 
         consoleThread.start();
+
+        // Thread 2: JOptionPane interface.
+        SwingUtilities.invokeLater(() -> runJOptionPaneMenu());
     }
 
     /**
@@ -72,6 +75,43 @@ public class Controller {
                     break;
             }
         } while (!menuOption.equalsIgnoreCase(EXIT));
+    }
+
+    /**
+     * Runs the JOptionPane menu independently.
+     */
+    public static void runJOptionPaneMenu() {
+        boolean running = true;
+        while (running) {
+            String option = (String) JOptionPane.showInputDialog(
+                    null,
+                    "Select an option:",
+                    "Food Ordering System",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    new String[]{
+                            "A) Add",
+                            "V) View",
+                            "X) Exit"
+                    },
+                    "A) Add"
+            );
+            if (option == null || option.startsWith("X")) {
+                running = false;
+                continue;
+            }
+            switch (option.substring(0, 1)) {
+                case "A":
+                    addJOptionPane();
+                    break;
+                case "V":
+                    viewJOptionPane();
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, MESSAGE_ERROR);
+                    break;
+            }
+        }
     }
 
     /**
@@ -163,6 +203,61 @@ public class Controller {
             System.out.println(MESSAGE_ERROR + ": Unable to read orders from file.");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Adds a food order through JOptionPane.
+     */
+    public static void addJOptionPane() {
+        FoodOrder newOrder = new FoodOrder();
+        try {
+            newOrder.getInformationJOptionPane();
+            // Reuse the Assignment #2 calculation.
+            double totalCost = foodOrderBO.calculate(newOrder);
+            newOrder.setTotalCost(totalCost);
+            orderList.add(newOrder);
+            writeAll();
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Food order added successfully."
+                            + System.lineSeparator()
+                            + String.format(
+                            "Total cost: $%.2f",
+                            newOrder.getTotalCost()
+                    )
+            );
+        } catch (java.util.concurrent.CancellationException e) {
+            JOptionPane.showMessageDialog(null, "Order entry cancelled.");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Please enter valid numbers for quantity and price.",
+                    MESSAGE_ERROR,
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    /**
+     * Displays all food orders through JOptionPane.
+     */
+    public static void viewJOptionPane() {
+        if (orderList.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No food orders found.");
+            return;
+        }
+        StringBuilder output = new StringBuilder();
+        for (FoodOrder order : orderList) {
+            output.append(order.toString())
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+        }
+        JOptionPane.showMessageDialog(
+                null,
+                output.toString(),
+                "All Food Orders",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     /**

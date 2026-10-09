@@ -2,6 +2,7 @@ package ca.hccis.files.entity;
 
 import ca.hccis.util.CisUtility;
 
+import javax.swing.JOptionPane;
 
 /**
  * Represents a food order for the Naija Cuisines
@@ -36,24 +37,51 @@ public class FoodOrder {
      * unit testing assignment.
      */
     public void getInformation() {
-        customerName = CisUtility.getInputString(
-                "Customer Name: ");
-        phoneNumber = CisUtility.getInputString(
-                "Phone Number: ");
-        mealName = CisUtility.getInputString(
-                "Meal Name: ");
-        quantity = CisUtility.getInputInt(
-                "Quantity: ");
-        pricePerMeal = CisUtility.getInputDouble(
-                "Price Per Meal: ");
-        orderType = CisUtility.getInputString(
-                "Order Type (Pickup/Delivery): ");
-        deliveryFee = CisUtility.getInputDouble(
-                "Delivery Fee: ");
-        orderDate = CisUtility.getInputString(
-                "Order Date: ");
+        customerName = CisUtility.getInputString("Customer Name: ");
+        phoneNumber = CisUtility.getInputString("Phone Number: ");
+        mealName = CisUtility.getInputString("Meal Name: ");
+        quantity = CisUtility.getInputInt("Quantity: ");
+        pricePerMeal = CisUtility.getInputDouble("Price Per Meal: ");
+        orderType = CisUtility.getInputString("Order Type (Pickup/Delivery): ");
+        deliveryFee = CisUtility.getInputDouble("Delivery Fee: ");
+        orderDate = CisUtility.getInputString("Order Date: ");
         // Calculation is not required for this assignment.
         totalCost = 0;
+    }
+
+
+    /**
+     * Gets food order information using JOptionPane.
+     */
+    public void getInformationJOptionPane() {
+        customerName = JOptionPane.showInputDialog("Enter customer name:");
+        if (customerName == null) {throw new java.util.concurrent.CancellationException();}
+        phoneNumber = JOptionPane.showInputDialog("Enter phone number:");
+        if (phoneNumber == null) {throw new java.util.concurrent.CancellationException();}
+        mealName = JOptionPane.showInputDialog("Enter meal name:");
+        if (mealName == null) {throw new java.util.concurrent.CancellationException();}
+        String quantityInput = JOptionPane.showInputDialog("Enter quantity:");
+        if (quantityInput == null) {throw new java.util.concurrent.CancellationException();}
+        quantity = Integer.parseInt(quantityInput);
+        String priceInput = JOptionPane.showInputDialog("Enter price per meal:");
+        if (priceInput == null) {throw new java.util.concurrent.CancellationException();}
+        pricePerMeal = Double.parseDouble(priceInput);
+        String[] orderTypes = {"Pickup", "Delivery"};
+        orderType = (String) JOptionPane.showInputDialog(
+                null,
+                "Select order type:",
+                "Food Order",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                orderTypes,
+                orderTypes[0]
+        );
+        if (orderType == null) {throw new java.util.concurrent.CancellationException();}
+        String deliveryInput = JOptionPane.showInputDialog("Enter delivery fee:");
+        if (deliveryInput == null) {throw new java.util.concurrent.CancellationException();}
+        deliveryFee = Double.parseDouble(deliveryInput);
+        orderDate = JOptionPane.showInputDialog("Enter order date:");
+        if (orderDate == null) {throw new java.util.concurrent.CancellationException();}
     }
 
     public String getCustomerName() {
