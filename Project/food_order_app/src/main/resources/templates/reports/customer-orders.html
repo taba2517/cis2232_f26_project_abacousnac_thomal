@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Order Report | Naija Cuisines</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF3E0;
+            color: #333;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            color: #E85D04;
+        }
+
+        .search-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin-top: 8px;
+        }
+
+        input {
+            width: min(350px, 90%);
+        }
+
+        button {
+            background-color: #E85D04;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #E85D04;
+            color: white;
+        }
+
+        .message {
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        a {
+            color: #E85D04;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Naija Cuisines</h1>
+    <h2>Customer Order Report</h2>
+
+    <p>Search for orders by customer name.</p>
+
+    <form class="search-form"
+          th:action="@{/reports/customer-orders}"
+          method="get">
+
+        <label for="customerName">Customer Name:</label>
+        <br>
+
+        <input type="text"
+               id="customerName"
+               name="customerName"
+               placeholder="Enter customer name"
+               th:value="${customerName}">
+
+        <button type="submit">Search Orders</button>
+    </form>
+
+    <div th:if="${customerName != null and !customerName.isEmpty()}">
+        <h2>Search Results</h2>
+
+        <div class="table-wrapper"
+             th:if="${not #lists.isEmpty(orders)}">
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Meal Name</th>
+                    <th>Quantity</th>
+                    <th>Order Type</th>
+                    <th>Order Date</th>
+                    <th>Total Cost</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.customerName}"></td>
+                    <td th:text="${order.mealName}"></td>
+                    <td th:text="${order.quantity}"></td>
+                    <td th:text="${order.orderType}"></td>
+                    <td th:text="${order.orderDate}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(order.totalCost, 1, 2)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="message"
+           th:if="${#lists.isEmpty(orders)}">
+            No orders found for this customer name.
+        </p>
+    </div>
+
+    <p><a th:href="@{/}">Return to Home</a></p>
+
+</div>
+</body>
+</html>

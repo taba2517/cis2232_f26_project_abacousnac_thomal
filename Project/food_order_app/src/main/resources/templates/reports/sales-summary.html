@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Summary Report | Naija Cuisines</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF3E0;
+            color: #333;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            color: #E85D04;
+        }
+
+        .form-card, .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            font-size: 15px;
+        }
+
+        button {
+            background-color: #E85D04;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #E85D04;
+            color: white;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            background: #FFF3E0;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .summary-item strong {
+            display: block;
+            margin-top: 8px;
+            font-size: 22px;
+        }
+
+        .message {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        a {
+            color: #E85D04;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Naija Cuisines</h1>
+    <h2>Sales Summary Report</h2>
+
+    <p>Choose a date range and order type to view sales.</p>
+
+    <form class="form-card"
+          th:action="@{/reports/sales-summary}"
+          method="get">
+
+        <div class="filters">
+            <div class="field">
+                <label for="startDate">Start Date:</label>
+                <input type="date"
+                       id="startDate"
+                       name="startDate"
+                       th:value="${startDate}">
+            </div>
+
+            <div class="field">
+                <label for="endDate">End Date:</label>
+                <input type="date"
+                       id="endDate"
+                       name="endDate"
+                       th:value="${endDate}">
+            </div>
+
+            <div class="field">
+                <label for="orderType">Order Type:</label>
+                <select id="orderType" name="orderType">
+                    <option value="All"
+                            th:selected="${orderType == 'All'}">All</option>
+                    <option value="Pickup"
+                            th:selected="${orderType == 'Pickup'}">Pickup</option>
+                    <option value="Delivery"
+                            th:selected="${orderType == 'Delivery'}">Delivery</option>
+                </select>
+            </div>
+
+            <button type="submit">Generate Report</button>
+        </div>
+    </form>
+
+    <div th:if="${reportGenerated}">
+        <h2>Order Results</h2>
+
+        <div class="table-wrapper"
+             th:if="${not #lists.isEmpty(orders)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Meal Name</th>
+                    <th>Quantity</th>
+                    <th>Order Type</th>
+                    <th>Order Date</th>
+                    <th>Total Cost</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.customerName}"></td>
+                    <td th:text="${order.mealName}"></td>
+                    <td th:text="${order.quantity}"></td>
+                    <td th:text="${order.orderType}"></td>
+                    <td th:text="${order.orderDate}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(order.totalCost, 1, 2)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="message"
+           th:if="${#lists.isEmpty(orders)}">
+            No orders were found for the selected criteria.
+        </p>
+
+        <h2>Sales Summary</h2>
+
+        <div class="summary-card">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    Total Orders
+                    <strong th:text="${summary.totalOrders}">0</strong>
+                </div>
+
+                <div class="summary-item">
+                    Total Quantity
+                    <strong th:text="${summary.totalQuantity}">0</strong>
+                </div>
+
+                <div class="summary-item">
+                    Total Revenue
+                    <strong th:text="${'$' + #numbers.formatDecimal(summary.totalRevenue, 1, 2)}">$0.00</strong>
+                </div>
+            </div>
+        </div>
+
+        <h2>Sales by Order Type</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>Order Type</th>
+                    <th>Total Orders</th>
+                    <th>Total Revenue</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="sale : ${salesByOrderType}">
+                    <td th:text="${sale.orderType}"></td>
+                    <td th:text="${sale.totalOrders}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(sale.totalRevenue, 1, 2)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p th:unless="${reportGenerated}" class="message">
+        Select a valid start date and end date, then generate the report.
+    </p>
+
+    <p><a th:href="@{/reports/customer-orders}">Customer Order Report</a></p>
+    <p><a th:href="@{/}">Return to Home</a></p>
+
+</div>
+</body>
+</html>
