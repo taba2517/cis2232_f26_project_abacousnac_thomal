@@ -57,6 +57,10 @@
             cursor: pointer;
         }
 
+        button:hover {
+            background-color: #C94F00;
+        }
+
         .table-wrapper {
             overflow-x: auto;
             margin-bottom: 25px;
@@ -101,10 +105,24 @@
             background: white;
             padding: 15px;
             border-radius: 6px;
+            margin: 15px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .success {
+            border-left: 5px solid #2E7D32;
+        }
+
+        .error {
+            border-left: 5px solid #C62828;
         }
 
         a {
             color: #E85D04;
+        }
+
+        canvas {
+            max-width: 100%;
         }
     </style>
 </head>
@@ -122,12 +140,14 @@
           method="get">
 
         <div class="filters">
+
             <div class="field">
                 <label for="startDate">Start Date:</label>
                 <input type="date"
                        id="startDate"
                        name="startDate"
-                       th:value="${startDate}">
+                       th:value="${startDate}"
+                       required>
             </div>
 
             <div class="field">
@@ -135,18 +155,25 @@
                 <input type="date"
                        id="endDate"
                        name="endDate"
-                       th:value="${endDate}">
+                       th:value="${endDate}"
+                       required>
             </div>
 
             <div class="field">
                 <label for="orderType">Order Type:</label>
                 <select id="orderType" name="orderType">
                     <option value="All"
-                            th:selected="${orderType == 'All'}">All</option>
+                            th:selected="${orderType == 'All'}">
+                        All
+                    </option>
                     <option value="Pickup"
-                            th:selected="${orderType == 'Pickup'}">Pickup</option>
+                            th:selected="${orderType == 'Pickup'}">
+                        Pickup
+                    </option>
                     <option value="Delivery"
-                            th:selected="${orderType == 'Delivery'}">Delivery</option>
+                            th:selected="${orderType == 'Delivery'}">
+                        Delivery
+                    </option>
                 </select>
             </div>
 
@@ -154,11 +181,30 @@
         </div>
     </form>
 
+    <!-- File export confirmation -->
+    <div class="message success"
+         th:if="${reportSaved == true}">
+        <strong>Report saved successfully!</strong>
+        <p>File name:
+            <strong th:text="${reportFileName}"></strong>
+        </p>
+        <p>Location: C:\cis2232\</p>
+    </div>
+
+    <div class="message error"
+         th:if="${reportSaved == false}">
+        <strong>Report export failed.</strong>
+        <p th:text="${reportFileError}"></p>
+    </div>
+
+    <!-- Report results -->
     <div th:if="${reportGenerated}">
+
         <h2>Order Results</h2>
 
         <div class="table-wrapper"
              th:if="${not #lists.isEmpty(orders)}">
+
             <table>
                 <thead>
                 <tr>
@@ -173,12 +219,12 @@
 
                 <tbody>
                 <tr th:each="order : ${orders}">
-                    <td th:text="${order.customerName}"></td>
-                    <td th:text="${order.mealName}"></td>
-                    <td th:text="${order.quantity}"></td>
-                    <td th:text="${order.orderType}"></td>
-                    <td th:text="${order.orderDate}"></td>
-                    <td th:text="${'$' + #numbers.formatDecimal(order.totalCost, 1, 2)}"></td>
+                    <td th:text="${order['customerName']}"></td>
+                    <td th:text="${order['mealName']}"></td>
+                    <td th:text="${order['quantity']}"></td>
+                    <td th:text="${order['orderType']}"></td>
+                    <td th:text="${order['orderDate']}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(order['totalCost'], 1, 2)}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -189,27 +235,102 @@
             No orders were found for the selected criteria.
         </p>
 
+        <!-- Sales totals -->
         <h2>Sales Summary</h2>
 
         <div class="summary-card">
             <div class="summary-grid">
+
                 <div class="summary-item">
                     Total Orders
-                    <strong th:text="${summary.totalOrders}">0</strong>
+                    <strong th:text="${summary['totalOrders']}">0</strong>
                 </div>
 
                 <div class="summary-item">
                     Total Quantity
-                    <strong th:text="${summary.totalQuantity}">0</strong>
+                    <strong th:text="${summary['totalQuantity']}">0</strong>
                 </div>
 
                 <div class="summary-item">
                     Total Revenue
-                    <strong th:text="${'$' + #numbers.formatDecimal(summary.totalRevenue, 1, 2)}">$0.00</strong>
+                    <strong th:text="${'$' + #numbers.formatDecimal(summary['totalRevenue'], 1, 2)}">$0.00</strong>
                 </div>
+
             </div>
         </div>
 
+        <!-- Revenue bar chart -->
+        <h2>Revenue by Order Type</h2>
+
+        <div class="summary-card">
+            <canvas id="revenueChart" height="100"></canvas>
+
+            <p th:if="${#lists.isEmpty(salesByOrderType)}">
+                No sales data is available to display yet.
+            </p>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script th:inline="javascript">
+            const salesData = /*[[${salesByOrderType}]]*/ [];
+
+            const labels = salesData.map(
+                item => item.orderType
+            );
+
+            const revenues = salesData.map(
+                item => Number(item.totalRevenue)
+            );
+
+            const canvas = document.getElementById('revenueChart');
+
+            if (labels.length > 0) {
+                new Chart(canvas, {
+                    type: 'bar',
+
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total Revenue ($)',
+                            data: revenues,
+                            backgroundColor: '#E85D04',
+                            borderColor: '#C94F00',
+                            borderWidth: 1
+                        }]
+                    },
+
+                    options: {
+                        responsive: true,
+
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Revenue ($)'
+                                }
+                            },
+
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Order Type'
+                                }
+                            }
+                        },
+
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+            }
+        </script>
+
+        <!-- Revenue breakdown table -->
         <h2>Sales by Order Type</h2>
 
         <div class="table-wrapper">
@@ -224,21 +345,31 @@
 
                 <tbody>
                 <tr th:each="sale : ${salesByOrderType}">
-                    <td th:text="${sale.orderType}"></td>
-                    <td th:text="${sale.totalOrders}"></td>
-                    <td th:text="${'$' + #numbers.formatDecimal(sale.totalRevenue, 1, 2)}"></td>
+                    <td th:text="${sale['orderType']}"></td>
+                    <td th:text="${sale['totalOrders']}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(sale['totalRevenue'], 1, 2)}"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
+
     </div>
 
     <p th:unless="${reportGenerated}" class="message">
         Select a valid start date and end date, then generate the report.
     </p>
 
-    <p><a th:href="@{/reports/customer-orders}">Customer Order Report</a></p>
-    <p><a th:href="@{/}">Return to Home</a></p>
+    <p>
+        <a th:href="@{/reports/customer-orders}">
+            Customer Order Report
+        </a>
+    </p>
+
+    <p>
+        <a th:href="@{/}">
+            Return to Home
+        </a>
+    </p>
 
 </div>
 </body>

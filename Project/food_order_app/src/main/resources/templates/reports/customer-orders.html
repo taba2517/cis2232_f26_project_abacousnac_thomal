@@ -75,6 +75,14 @@
             border-radius: 6px;
         }
 
+        .success {
+            border-left: 5px solid #2E7D32;
+        }
+
+        .error {
+            border-left: 5px solid #C62828;
+        }
+
         a {
             color: #E85D04;
         }
@@ -104,6 +112,21 @@
 
         <button type="submit">Search Orders</button>
     </form>
+
+    <div class="message success"
+         th:if="${reportSaved == true}">
+        <strong>Report saved successfully!</strong>
+        <p>File name:
+            <strong th:text="${reportFileName}"></strong>
+        </p>
+        <p>Location: C:\cis2232\</p>
+    </div>
+
+    <div class="message error"
+         th:if="${reportSaved == false}">
+        <strong>Report export failed.</strong>
+        <p th:text="${reportFileError}"></p>
+    </div>
 
     <div th:if="${customerName != null and !customerName.isEmpty()}">
         <h2>Search Results</h2>
