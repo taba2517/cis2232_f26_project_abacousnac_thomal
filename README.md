@@ -75,11 +75,11 @@ will be $59.
 
 ## Report Details
 
-## Customer Order Report
+# Customer Order Report
 
 Enter a customer name and the report will return all orders where the customer name contains the entered text. On the report results page, only show the customer name, meal name, quantity, order type, order date, and total cost.
 
-## Sales Summary Report
+# Sales Summary Report
 
 Enter a start date and an end date to display all orders placed within that date range. Give the user a dropdown to filter orders by All, Pickup, or Delivery. On the report results page, show the customer name, meal name, quantity, order type, order date, and total cost.
 
