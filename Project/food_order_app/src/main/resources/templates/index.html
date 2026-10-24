@@ -1,73 +1,215 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Naija Cuisines</title>
+    <title>Naija Cuisines | Food Ordering and Catering System</title>
 
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #FFF3E0;
-            color: #333333;
+        * {
+            box-sizing: border-box;
         }
 
-        header {
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #FFF3E0;
+            color: #333;
+        }
+
+        .hero {
             background-color: #E85D04;
             color: white;
-            padding: 30px;
             text-align: center;
+            padding: 50px 20px;
         }
 
-        main {
-            text-align: center;
-            padding: 50px;
+        .hero h1 {
+            font-size: 42px;
+            margin: 15px 0 25px;
         }
 
-        .welcome-box {
+        .hero p {
+            font-size: 23px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-card {
             background-color: white;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 30px;
-            border-radius: 10px;
+            text-align: center;
+            padding: 45px 25px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+
+        .welcome-card h2 {
+            font-size: 30px;
+            margin-bottom: 25px;
+        }
+
+        .welcome-card p {
+            font-size: 21px;
+            margin-bottom: 40px;
         }
 
         .button {
             display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
             background-color: #E85D04;
             color: white;
+            padding: 17px 35px;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
         }
 
         .button:hover {
-            background-color: #c94f03;
+            background-color: #C94F00;
+        }
+
+        .reports-section h2 {
+            color: #E85D04;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 25px;
+        }
+
+        .report-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            border-top: 5px solid #E85D04;
+        }
+
+        .report-card h3 {
+            font-size: 22px;
+            margin-top: 0;
+        }
+
+        .report-card p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .report-link {
+            color: #E85D04;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .report-link:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #555;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-card h2 {
+                font-size: 25px;
+            }
+        }
+
+        .button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
     </style>
 </head>
 
 <body>
 
-<header>
+<header class="hero">
     <h1>Naija Cuisines</h1>
     <p>Food Ordering and Catering System</p>
 </header>
 
-<main>
-    <div class="welcome-box">
+<main class="container">
+
+    <section class="welcome-card">
         <h2>Welcome to Naija Cuisines</h2>
 
         <p>
             Order your favourite Nigerian meals for pickup or delivery.
         </p>
 
-        <a href="#" class="button">Place an Order</a>
-    </div>
+        <button class="button" type="button" disabled>
+            Place an Order
+        </button>
+    </section>
+
+    <section class="reports-section">
+        <h2>Reports</h2>
+
+        <div class="reports-grid">
+
+            <article class="report-card">
+                <h3>Customer Order Report</h3>
+
+                <p>
+                    Search for customer orders by name and review
+                    the matching meals, quantities, dates, and costs.
+                </p>
+
+                <a class="report-link"
+                   th:href="@{/reports/customer-orders}">
+                    View Customer Orders &rarr;
+                </a>
+            </article>
+
+            <article class="report-card">
+                <h3>Sales Summary Report</h3>
+
+                <p>
+                    Filter orders by date range and order type,
+                    review sales totals, and compare pickup and
+                    delivery revenue.
+                </p>
+
+                <a class="report-link"
+                   th:href="@{/reports/sales-summary}">
+                    View Sales Summary &rarr;
+                </a>
+            </article>
+
+        </div>
+    </section>
+
 </main>
+
+<footer>
+    &copy; 2026 Naija Cuisines
+</footer>
 
 </body>
 </html>
