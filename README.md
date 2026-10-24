@@ -75,4 +75,12 @@ will be $59.
 
 ## Report Details
 
-To be determined in future sprint
+Customer Order Report
+
+Enter a customer name and the report will return all orders where the customer name contains the entered text. On the report results page, only show the customer name, meal name, quantity, order type, order date, and total cost.
+
+Sales Summary Report
+
+Enter a start date and an end date to display all orders placed within that date range. Give the user a dropdown to filter orders by All, Pickup, or Delivery. On the report results page, show the customer name, meal name, quantity, order type, order date, and total cost.
+
+Display the total number of orders, total quantity ordered, and total revenue for the selected period. Include a bar chart showing the total revenue for pickup and delivery orders.
