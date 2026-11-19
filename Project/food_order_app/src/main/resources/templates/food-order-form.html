@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Food Order | Naija Cuisines</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #FFF3E0;
+            color: #333;
+        }
+
+        header {
+            background-color: #E85D04;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+            font-size: 34px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background-color: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-card h2 {
+            color: #E85D04;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #E85D04;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .save-button,
+        .cancel-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            padding: 0 25px;
+            border-radius: 7px;
+            border: none;
+            background-color: #E85D04;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .save-button:hover,
+        .cancel-button:hover {
+            background-color: #C94F00;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #555;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 27px;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Naija Cuisines</h1>
+    <p>Food Ordering and Catering System</p>
+</header>
+
+<main class="container">
+
+    <section class="form-card">
+
+        <h2>Add New Food Order</h2>
+
+        <form th:action="@{/orders/save}"
+              th:object="${foodOrder}"
+              method="post">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="customerName">Customer Name</label>
+                    <input type="text"
+                           id="customerName"
+                           th:field="*{customerName}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="tel"
+                           id="phoneNumber"
+                           th:field="*{phoneNumber}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="mealName">Meal Name</label>
+                    <input type="text"
+                           id="mealName"
+                           th:field="*{mealName}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number"
+                           id="quantity"
+                           th:field="*{quantity}"
+                           min="1"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pricePerMeal">Price Per Meal ($)</label>
+                    <input type="number"
+                           id="pricePerMeal"
+                           th:field="*{pricePerMeal}"
+                           min="0"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="orderType">Order Type</label>
+                    <select id="orderType"
+                            th:field="*{orderType}"
+                            required>
+                        <option value="">Select Order Type</option>
+                        <option value="Pickup">Pickup</option>
+                        <option value="Delivery">Delivery</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="deliveryFee">Delivery Fee ($)</label>
+                    <input type="number"
+                           id="deliveryFee"
+                           th:field="*{deliveryFee}"
+                           min="0"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="orderDate">Order Date</label>
+                    <input type="date"
+                           id="orderDate"
+                           th:field="*{orderDate}"
+                           required>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button type="submit" class="save-button">
+                    Save Food Order
+                </button>
+
+                <a th:href="@{/orders}" class="cancel-button">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+<footer>
+    &copy; 2026 Naija Cuisines
+</footer>
+
+</body>
+</html>

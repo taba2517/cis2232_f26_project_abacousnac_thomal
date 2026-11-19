@@ -89,16 +89,30 @@
             color: #777;
         }
 
-        .back-link {
-            display: inline-block;
+        /* Page navigation buttons */
+        .page-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
             margin-top: 25px;
-            background-color: #E85D04;
-            color: white;
-            padding: 12px 22px;
-            border-radius: 7px;
-            text-decoration: none;
         }
 
+        .add-button,
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 56px;
+            padding: 0 22px;
+            border-radius: 7px;
+            background-color: #E85D04;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .add-button:hover,
         .back-link:hover {
             background-color: #C94F00;
         }
@@ -116,6 +130,15 @@
 
             .orders-card {
                 padding: 18px;
+            }
+
+            .page-actions {
+                flex-direction: column;
+            }
+
+            .add-button,
+            .back-link {
+                width: 100%;
             }
         }
     </style>
@@ -194,9 +217,15 @@
 
         </div>
 
-        <a th:href="@{/}" class="back-link">
-            Back to Home
-        </a>
+        <div class="page-actions">
+            <a th:href="@{/orders/new}" class="add-button">
+                + Add New Food Order
+            </a>
+
+            <a th:href="@{/}" class="back-link">
+                Back to Home
+            </a>
+        </div>
 
     </section>
 
