@@ -1,6 +1,10 @@
 package ca.hccis.files.entity;
 
+import jakarta.persistence.*;
 import ca.hccis.util.CisUtility;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * Represents a food order for the Naija Cuisines
@@ -9,50 +13,54 @@ import ca.hccis.util.CisUtility;
  * @author Thomal Abacousnac
  * @since 20260923
  */
+@Entity
+@Table(name = "food_order")
 public class FoodOrder {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     private String customerName;
     private String phoneNumber;
     private String mealName;
     private int quantity;
-    private double pricePerMeal;
+    private BigDecimal pricePerMeal;
     private String orderType;
-    private double deliveryFee;
-    private String orderDate;
-    private double totalCost;
+    private BigDecimal deliveryFee;
+    private LocalDate orderDate;
+    private BigDecimal totalCost;
 
-    /**
-     * Default constructor.
-     */
     public FoodOrder() {
     }
 
-    /**
-     * Gets the information for a new food order.
-     * <p>
-     * Note:
-     * Total Cost calculation is intentionally not performed
-     * for this assignment. It will be completed in the
-     * unit testing assignment.
-     */
     public void getInformation() {
-        customerName = CisUtility.getInputString(
-                "Customer Name: ");
-        phoneNumber = CisUtility.getInputString(
-                "Phone Number: ");
-        mealName = CisUtility.getInputString(
-                "Meal Name: ");
-        quantity = CisUtility.getInputInt(
-                "Quantity: ");
-        pricePerMeal = CisUtility.getInputDouble(
-                "Price Per Meal: ");
+        customerName = CisUtility.getInputString("Customer Name: ");
+        phoneNumber = CisUtility.getInputString("Phone Number: ");
+        mealName = CisUtility.getInputString("Meal Name: ");
+        quantity = CisUtility.getInputInt("Quantity: ");
+
+        pricePerMeal = BigDecimal.valueOf(
+                CisUtility.getInputDouble("Price Per Meal: "));
+
         orderType = CisUtility.getInputString(
                 "Order Type (Pickup/Delivery): ");
-        deliveryFee = CisUtility.getInputDouble(
-                "Delivery Fee: ");
-        orderDate = CisUtility.getInputString(
-                "Order Date: ");
-        // Calculation is not required for this assignment.
-        totalCost = 0;
+
+        deliveryFee = BigDecimal.valueOf(
+                CisUtility.getInputDouble("Delivery Fee: "));
+
+        orderDate = LocalDate.parse(
+                CisUtility.getInputString("Order Date (YYYY-MM-DD): "));
+
+        totalCost = BigDecimal.ZERO;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getCustomerName() {
@@ -87,11 +95,11 @@ public class FoodOrder {
         this.quantity = quantity;
     }
 
-    public double getPricePerMeal() {
+    public BigDecimal getPricePerMeal() {
         return pricePerMeal;
     }
 
-    public void setPricePerMeal(double pricePerMeal) {
+    public void setPricePerMeal(BigDecimal pricePerMeal) {
         this.pricePerMeal = pricePerMeal;
     }
 
@@ -103,55 +111,44 @@ public class FoodOrder {
         this.orderType = orderType;
     }
 
-    public double getDeliveryFee() {
+    public BigDecimal getDeliveryFee() {
         return deliveryFee;
     }
 
-    public void setDeliveryFee(double deliveryFee) {
+    public void setDeliveryFee(BigDecimal deliveryFee) {
         this.deliveryFee = deliveryFee;
     }
 
-    public String getOrderDate() {
+    public LocalDate getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(String orderDate) {
+    public void setOrderDate(LocalDate orderDate) {
         this.orderDate = orderDate;
     }
 
-    public double getTotalCost() {
+    public BigDecimal getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(double totalCost) {
+    public void setTotalCost(BigDecimal totalCost) {
         this.totalCost = totalCost;
     }
 
     @Override
     public String toString() {
-        return System.lineSeparator()
-                + "Food Order"
-                + System.lineSeparator()
-                + "------------------------------"
-                + System.lineSeparator()
-                + "Customer Name: " + customerName
-                + System.lineSeparator()
-                + "Phone Number: " + phoneNumber
-                + System.lineSeparator()
-                + "Meal Name: " + mealName
-                + System.lineSeparator()
-                + "Quantity: " + quantity
-                + System.lineSeparator()
-                + String.format("Price Per Meal: $%.2f", pricePerMeal)
-                + System.lineSeparator()
-                + "Order Type: " + orderType
-                + System.lineSeparator()
-                + String.format("Delivery Fee: $%.2f", deliveryFee)
-                + System.lineSeparator()
-                + "Order Date: " + orderDate
-                + System.lineSeparator()
-                + String.format("Total Cost: $%.2f", totalCost)
-                + System.lineSeparator()
+        return "Food Order\n"
+                + "------------------------------\n"
+                + "ID: " + id + "\n"
+                + "Customer Name: " + customerName + "\n"
+                + "Phone Number: " + phoneNumber + "\n"
+                + "Meal Name: " + mealName + "\n"
+                + "Quantity: " + quantity + "\n"
+                + "Price Per Meal: $" + pricePerMeal + "\n"
+                + "Order Type: " + orderType + "\n"
+                + "Delivery Fee: $" + deliveryFee + "\n"
+                + "Order Date: " + orderDate + "\n"
+                + "Total Cost: $" + totalCost + "\n"
                 + "------------------------------";
     }
 }
