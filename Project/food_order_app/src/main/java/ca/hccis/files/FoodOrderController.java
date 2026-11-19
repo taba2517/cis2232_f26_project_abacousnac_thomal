@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import java.math.BigDecimal;
 
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+
 import java.util.List;
 
 @Controller
@@ -41,14 +44,20 @@ public class FoodOrderController {
     }
 
     @PostMapping("/orders/save")
-    public String saveOrder(FoodOrder foodOrder) {
+    public String saveOrder(
+            @Valid FoodOrder foodOrder,
+            BindingResult bindingResult,
+            Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("foodOrder", foodOrder);
+            return "food-order-form";
+        }
 
         BigDecimal mealTotal = foodOrder.getPricePerMeal()
                 .multiply(BigDecimal.valueOf(foodOrder.getQuantity()));
 
-        BigDecimal deliveryFee = foodOrder.getDeliveryFee() != null
-                ? foodOrder.getDeliveryFee()
-                : BigDecimal.ZERO;
+        BigDecimal deliveryFee = foodOrder.getDeliveryFee();
 
         foodOrder.setTotalCost(mealTotal.add(deliveryFee));
 

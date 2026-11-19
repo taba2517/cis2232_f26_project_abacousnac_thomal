@@ -1,5 +1,6 @@
 package ca.hccis.files.entity;
 
+import jakarta.validation.constraints.*;
 import jakarta.persistence.*;
 import ca.hccis.util.CisUtility;
 
@@ -21,32 +22,52 @@ public class FoodOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "Customer name is required.")
+    @Size(max = 100, message = "Customer name cannot exceed 100 characters.")
     @Column(name = "customerName")
     private String customerName;
 
+    @NotBlank(message = "Phone number is required.")
+    @Size(max = 20, message = "Phone number cannot exceed 20 characters.")
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
+    @NotBlank(message = "Meal name is required.")
+    @Size(max = 100, message = "Meal name cannot exceed 100 characters.")
     @Column(name = "mealName")
     private String mealName;
 
+    @Min(value = 1, message = "Quantity must be at least 1.")
     @Column(name = "quantity")
     private int quantity;
 
+    @NotNull(message = "Price per meal is required.")
+    @DecimalMin(value = "0.00", message = "Price cannot be negative.")
+    @Digits(integer = 8, fraction = 2,
+            message = "Price must have no more than 2 decimal places.")
     @Column(name = "pricePerMeal")
     private BigDecimal pricePerMeal;
 
+    @NotBlank(message = "Please select an order type.")
+    @Pattern(regexp = "Pickup|Delivery",
+            message = "Order type must be Pickup or Delivery.")
     @Column(name = "orderType")
     private String orderType;
 
+    @NotNull(message = "Delivery fee is required.")
+    @DecimalMin(value = "0.00", message = "Delivery fee cannot be negative.")
+    @Digits(integer = 8, fraction = 2,
+            message = "Delivery fee must have no more than 2 decimal places.")
     @Column(name = "deliveryFee")
     private BigDecimal deliveryFee;
 
+    @NotNull(message = "Order date is required.")
     @Column(name = "orderDate")
     private LocalDate orderDate;
 
     @Column(name = "totalCost")
     private BigDecimal totalCost;
+
 
 
     public FoodOrder() {

@@ -145,6 +145,13 @@
                 flex-direction: column;
             }
         }
+
+        .field-error {
+            color: #c62828;
+            font-size: 13px;
+            margin-top: 5px;
+            display: block;
+        }
     </style>
 </head>
 
@@ -173,6 +180,10 @@
                            id="customerName"
                            th:field="*{customerName}"
                            required>
+                    <small class="field-error"
+                           th:if="${#fields.hasErrors('customerName')}"
+                           th:errors="*{customerName}">
+                    </small>
                 </div>
 
                 <div class="form-group">
