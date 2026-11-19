@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Food Orders | Naija Cuisines</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #FFF3E0;
+            color: #333;
+        }
+
+        header {
+            background-color: #E85D04;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+            font-size: 34px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .orders-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        .orders-card h2 {
+            color: #E85D04;
+            margin-top: 0;
+        }
+
+        .order-count {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            background-color: #E85D04;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tbody tr:hover {
+            background-color: #FFF3E0;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 35px;
+            color: #777;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            background-color: #E85D04;
+            color: white;
+            padding: 12px 22px;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            background-color: #C94F00;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #555;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 27px;
+            }
+
+            .orders-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Naija Cuisines</h1>
+    <p>Food Ordering and Catering System</p>
+</header>
+
+<main class="container">
+
+    <section class="orders-card">
+
+        <h2>Food Orders</h2>
+
+        <p class="order-count">
+            Total Orders:
+            <strong th:text="${#lists.size(orders)}">0</strong>
+        </p>
+
+        <table th:if="${not #lists.isEmpty(orders)}">
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer Name</th>
+                <th>Phone Number</th>
+                <th>Meal Name</th>
+                <th>Quantity</th>
+                <th>Price Per Meal</th>
+                <th>Order Type</th>
+                <th>Delivery Fee</th>
+                <th>Order Date</th>
+                <th>Total Cost</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="order : ${orders}">
+
+                <td th:text="${order.id}"></td>
+                <td th:text="${order.customerName}"></td>
+                <td th:text="${order.phoneNumber}"></td>
+                <td th:text="${order.mealName}"></td>
+                <td th:text="${order.quantity}"></td>
+
+                <td>
+                    $<span th:text="${#numbers.formatDecimal(order.pricePerMeal, 1, 2)}"></span>
+                </td>
+
+                <td th:text="${order.orderType}"></td>
+
+                <td>
+                    $<span th:text="${#numbers.formatDecimal(order.deliveryFee, 1, 2)}"></span>
+                </td>
+
+                <td th:text="${order.orderDate}"></td>
+
+                <td>
+                    $<span th:text="${#numbers.formatDecimal(order.totalCost, 1, 2)}"></span>
+                </td>
+
+            </tr>
+            </tbody>
+
+        </table>
+
+        <div class="empty-message"
+             th:if="${#lists.isEmpty(orders)}">
+
+            <h3>No Food Orders Found</h3>
+            <p>There are currently no food orders in the database.</p>
+
+        </div>
+
+        <a th:href="@{/}" class="back-link">
+            Back to Home
+        </a>
+
+    </section>
+
+</main>
+
+<footer>
+    &copy; 2026 Naija Cuisines
+</footer>
+
+</body>
+</html>

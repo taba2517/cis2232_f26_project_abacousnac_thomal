@@ -21,15 +21,33 @@ public class FoodOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "customerName")
     private String customerName;
+
+    @Column(name = "phoneNumber")
     private String phoneNumber;
+
+    @Column(name = "mealName")
     private String mealName;
+
+    @Column(name = "quantity")
     private int quantity;
+
+    @Column(name = "pricePerMeal")
     private BigDecimal pricePerMeal;
+
+    @Column(name = "orderType")
     private String orderType;
+
+    @Column(name = "deliveryFee")
     private BigDecimal deliveryFee;
+
+    @Column(name = "orderDate")
     private LocalDate orderDate;
+
+    @Column(name = "totalCost")
     private BigDecimal totalCost;
+
 
     public FoodOrder() {
     }
