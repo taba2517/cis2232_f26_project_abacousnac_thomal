@@ -85,4 +85,12 @@ public class FoodOrderController {
 
         return "food-order-form";
     }
+
+    @PostMapping("/orders/delete/{id}")
+    public String deleteOrder(@PathVariable int id) {
+
+        foodOrderRepository.deleteById(id);
+
+        return "redirect:/orders";
+    }
 }
