@@ -141,6 +141,48 @@
                 width: 100%;
             }
         }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-button,
+        .delete-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .edit-button {
+            background-color: #E85D04;
+            color: white;
+        }
+
+        .delete-button {
+            background-color: #C62828;
+            color: white;
+        }
+
+        .edit-button:hover {
+            background-color: #C94F00;
+        }
+
+        .delete-button:hover {
+            background-color: #A61B1B;
+        }
+
+        .action-buttons form {
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -205,20 +247,20 @@
                     $<span th:text="${#numbers.formatDecimal(order.totalCost, 1, 2)}"></span>
                 </td>
 
-                <td>
-                    <a th:href="@{/orders/edit/{id}(id=${order.id})}">
+                <td class="action-buttons">
+                    <a class="edit-button"
+                       th:href="@{/orders/edit/{id}(id=${order.id})}">
                         Edit
                     </a>
 
                     <form th:action="@{/orders/delete/{id}(id=${order.id})}"
-                          method="post"
-                          style="display: inline;">
+                          method="post">
 
-                        <button type="submit"
+                        <button class="delete-button"
+                                type="submit"
                                 onclick="return confirm('Are you sure you want to delete this food order?');">
                             Delete
                         </button>
-
                     </form>
                 </td>
             </tr>
