@@ -176,6 +176,7 @@
                 <th>Delivery Fee</th>
                 <th>Order Date</th>
                 <th>Total Cost</th>
+                <th>Actions</th>
             </tr>
             </thead>
 
@@ -204,6 +205,11 @@
                     $<span th:text="${#numbers.formatDecimal(order.totalCost, 1, 2)}"></span>
                 </td>
 
+                <td>
+                    <a th:href="@{/orders/edit/{id}(id=${order.id})}">
+                        Edit
+                    </a>
+                </td>
             </tr>
             </tbody>
 

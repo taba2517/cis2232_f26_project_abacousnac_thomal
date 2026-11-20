@@ -171,6 +171,7 @@
         <form th:action="@{/orders/save}"
               th:object="${foodOrder}"
               method="post">
+            <input type="hidden" th:field="*{id}">
 
             <div class="form-grid">
 
